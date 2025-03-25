@@ -74,6 +74,10 @@ public class UserDao  {
 		return repo.findByGender(gender);
 	}
 
+	public void deleteUser(Long id) {
+		repo.deleteById(id);
+	}
+
 	
 }
 

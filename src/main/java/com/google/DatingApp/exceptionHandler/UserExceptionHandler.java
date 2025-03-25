@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.google.DatingApp.exceptionclasses.DuplicateEmailException;
 import com.google.DatingApp.exceptionclasses.InvalidIDException;
+import com.google.DatingApp.exceptionclasses.InvalidOTPException;
 import com.google.DatingApp.exceptionclasses.NoUserFoundException;
 import com.google.DatingApp.responseStructure.ResponseStructure;
 
@@ -36,6 +37,14 @@ public class UserExceptionHandler {
 		ResponseStructure<String> rs = new ResponseStructure<>();
 		rs.setStatus(HttpStatus.BAD_REQUEST.value());
 		rs.setMessage("Invalid User Name");
+		rs.setBody(e.getMessage());
+		return rs;
+	}
+	@ExceptionHandler(InvalidOTPException.class)
+	public ResponseStructure<String> invalidOtpException(InvalidOTPException e){
+		ResponseStructure<String> rs = new ResponseStructure<>();
+		rs.setStatus(HttpStatus.BAD_REQUEST.value());
+		rs.setMessage("Invalid Otp");
 		rs.setBody(e.getMessage());
 		return rs;
 	}

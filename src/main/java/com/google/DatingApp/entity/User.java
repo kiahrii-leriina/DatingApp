@@ -25,6 +25,7 @@ public class User {
 		private String email;
 		private Long phone;
 		private String password;
+		private int otp;
 		
 		@Enumerated(EnumType.STRING)
 		private UserGender gender;
@@ -33,7 +34,7 @@ public class User {
 		private UserRole role = UserRole.USER;
 		
 		@Enumerated(EnumType.STRING)
-		private UserStatus status = UserStatus.ACTIVE;
+		private UserStatus status = UserStatus.INACTIVE;
 		
 		
 		//ElementCollection is used when the associated type is not entity and it can be used only with list

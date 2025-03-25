@@ -3,6 +3,7 @@ package com.google.DatingApp.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -120,5 +121,15 @@ public class UserController {
 			@PathVariable(name = "top") Integer top) {
 
 		return service.findAllMatchingUsers(id,top);
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseStructure<User> deleteUser(@PathVariable(name = "id") Long id){
+		return service.deleteUser(id);
+	}
+	
+	@PatchMapping("/verifyotp/{id}/{otp}")
+	public ResponseStructure<User> verifyOtp(@PathVariable(name = "id") Long id, @PathVariable(name = "otp") int otp){
+		return service.verifyOtp(id,otp);
 	}
 }

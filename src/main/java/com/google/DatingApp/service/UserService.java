@@ -18,8 +18,10 @@ import com.google.DatingApp.entity.UserRole;
 import com.google.DatingApp.entity.UserStatus;
 import com.google.DatingApp.exceptionclasses.DuplicateEmailException;
 import com.google.DatingApp.exceptionclasses.InvalidIDException;
+import com.google.DatingApp.exceptionclasses.InvalidOTPException;
 import com.google.DatingApp.exceptionclasses.NoUserFoundException;
 import com.google.DatingApp.responseStructure.ResponseStructure;
+import com.google.DatingApp.util.EmailService;
 import com.google.DatingApp.util.SortByAgeDefferenceInAcending;
 import com.google.DatingApp.util.UserGender;
 
@@ -27,8 +29,14 @@ import com.google.DatingApp.util.UserGender;
 public class UserService {
 	@Autowired
 	private UserDao dao;
+	
+	@Autowired
+	private EmailService emailService;
 
 	public ResponseStructure<User> saveUser(User user) {
+		user.setStatus(UserStatus.INACTIVE);
+		int otp = emailService.getOTP();
+		user.setOtp(otp);
 
 		Optional<User> opt = dao.findByEmail(user.getEmail());
 
@@ -37,8 +45,10 @@ public class UserService {
 		}
 
 		User saveUser = dao.saveUser(user);
+		
+		emailService.sendFirstEmail(saveUser);
+		
 		ResponseStructure<User> rs = new ResponseStructure<>();
-
 		rs.setStatus(HttpStatus.OK.value());
 		rs.setMessage("user saved successfully");
 		rs.setBody(saveUser);
@@ -302,5 +312,44 @@ public class UserService {
 			System.out.println(o);
 		}
 	}
+
+	public ResponseStructure<User> deleteUser(Long id) {
+		
+		Optional<User> byId = dao.findById(id);
+		if(byId.isEmpty()) {
+			throw new InvalidIDException("user with id "+id +" not found");
+		}
+		dao.deleteUser(id);
+		ResponseStructure<User> rs = new ResponseStructure<>();
+		rs.setStatus(HttpStatus.OK.value());
+		rs.setMessage("user deleted successfully");
+		rs.setBody(null);
+		return rs;
+	}
+
+	public ResponseStructure<User> verifyOtp(Long id, int otp) {
+		Optional<User> byId = dao.findById(id);
+		
+		if(byId.isEmpty()) {
+			throw new InvalidOTPException("user with id "+id +" not found");
+		}
+		
+		User user = byId.get();
+		
+		System.out.println("user otp "+otp);
+		if(otp != user.getOtp()) {
+			throw new InvalidOTPException("invalid otp");
+		}
+		user.setStatus(UserStatus.ACTIVE);
+		user = dao.saveUser(user);
+		ResponseStructure<User> rs = new ResponseStructure<>();
+		rs.setStatus(HttpStatus.OK.value());
+		rs.setMessage("user account set to active");
+		rs.setBody(user);
+		
+		return rs;
+	}
+
+	
 
 }
